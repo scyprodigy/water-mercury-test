@@ -11,10 +11,14 @@ const isLoading = ref(false);
 
 // 2. 統計數據計算 (精準對應截圖中的：總帳號數、啟用中、已停用)
 const stats = computed(() => {
-  const total = accounts.value.length;
-  const active = accounts.value.filter(a => a.status === 'active').length;
-  const inactive = total - active;
-  return { total, active, inactive };
+  const data = accounts.value || [];
+  return {
+    total: data.length,
+    // 💡 確保比對的是 API 定義的 Enum 值 'active'
+    active: data.filter(a => a.status === 'active').length, 
+    // 💡 剩餘即為 'disabled'
+    inactive: data.length - data.filter(a => a.status === 'active').length 
+  };
 });
 
 // 3. API 串接邏輯 (串接正確端點 /accounts)

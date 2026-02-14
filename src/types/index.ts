@@ -3,10 +3,10 @@ export interface Account {
   id: string | number;
   name: string;
   email: string;
-  role: '管理員' | '一般用戶' | string; // 根據實際回傳角色定義
-  status: 'active' | 'disabled' | string;
+  // 💡 確保 Enum 值與 Swagger 一致
+  role: 'admin' | 'user' | string;   
+  status: 'active' | 'disabled'; 
   createdAt: string;
-  avatar?: string;
 }
 
 // 定義 API 回傳的統一格式
