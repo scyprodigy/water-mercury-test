@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const request = axios.create({
-  baseURL: 'https://api-frontend-interview-server.metcfire.com.tw',
+  baseURL: 'https://api-frontend-interview-server.metcfire.com.tw/',
   headers: {
     // 💡 確保這裡沒有拼錯，且這行一定要在 headers 裡面
     'interviewerName': 'hanhsunlin', 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { debounce } from 'lodash-es';
 import request from '@/api/request';
 import UserCard from '@/components/UserCard.vue';
@@ -8,6 +9,7 @@ import UserCard from '@/components/UserCard.vue';
 const accounts = ref<any[]>([]);
 const searchText = ref('');
 const isLoading = ref(false);
+const router = useRouter();
 
 // 2. 統計數據計算 (精準對應截圖中的：總帳號數、啟用中、已停用)
 const stats = computed(() => {
@@ -25,25 +27,20 @@ const stats = computed(() => {
 const fetchAccounts = async (query = '') => {
   isLoading.value = true;
   try {
-    const res = await request.get('/accounts', {
-      params: { name: query }
-    });
-
-    // 💡 關鍵動作：在 Console 印出原始資料
-    console.log('--- API 回傳原始資料 ---');
-    console.log(res); 
-    console.log('-----------------------');
-
-    // 根據回傳結構自動解析 (通常 Axios 會把資料放在 res.data)
-    const data = res.data || res; 
-    accounts.value = Array.isArray(data) ? data : (data.items || []);
+    const res: any = await request.get('/accounts', { params: { name: query } });
     
+    // 💡 修正關鍵：嘗試從 res.data 或 res 取值 (相容不同版本的 Axios 封裝)
+    const result = res.data || res;
+    accounts.value = Array.isArray(result) ? result : (result.items || []);
+    
+    console.log('抓取成功，數量：', accounts.value.length);
   } catch (err) {
-    console.error('API 請求失敗，請檢查 Network 面板', err);
+    console.error('API 請求失敗，請檢查 interviewerName');
   } finally {
     isLoading.value = false;
   }
 };
+
 
 
 // 4. 加分項：搜尋防抖 (500ms)
@@ -52,6 +49,13 @@ const handleSearch = debounce(() => {
 }, 500);
 
 onMounted(fetchAccounts);
+
+//登出
+const handleLogout = () => {
+  localStorage.removeItem('token'); // 清除 Token
+  router.push('/login');            // 跳轉回登入頁
+};
+
 </script>
 
 <template>
@@ -69,9 +73,12 @@ onMounted(fetchAccounts);
             <p class="text-gray-400 text-sm font-medium">管理您的所有帳號與權限</p>
           </div>
         </div>
-        <button class="text-gray-400 hover:text-indigo-600 font-bold transition-all flex items-center gap-2">
-          <i class="q-icon material-icons">logout</i> 登出
-        </button>
+        <button 
+  @click="handleLogout"
+  class="flex items-center gap-2 text-gray-400 hover:text-indigo-600 font-bold px-4 py-2 transition-all cursor-pointer"
+>
+  <i class="q-icon material-icons">logout</i> 登出
+</button>
       </div>
 
       <!-- 第二區：功能列 (搜尋與新增) -->
