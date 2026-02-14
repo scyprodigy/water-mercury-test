@@ -4,8 +4,8 @@ import { useRouter } from 'vue-router';
 import request from '@/api/request';
 
 const router = useRouter();
-const email = ref('roger30903@gmail.com');
-const password = ref('123');
+const email = ref('');
+const password = ref('');
 const isLoading = ref(false);
 
 // 💡 實作：Email 格式驗證 + 隨意密碼登入
